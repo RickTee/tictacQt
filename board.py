@@ -42,12 +42,15 @@ class Board(QWidget):
         self.label = QLabel("Play")
         self.label.setAlignment(Qt.AlignCenter)
         vbox.addWidget(self.label)
+        # Add a label to contain warnings.
+        self.labelWarn = QLabel("")
+        self.labelWarn.setAlignment(Qt.AlignCenter)
         grid = QGridLayout()
         grid.setSpacing(0)
 
         self.board = [0]*9
         self.button = [0]*9
-        self.player = "O"
+        self.player = "X"
         k = 0
         # Create our board of 9 buttons and put them in a grid
         for i in range(0, 3):
@@ -59,6 +62,7 @@ class Board(QWidget):
                 k = k + 1
 
         vbox.addLayout(grid)
+        vbox.addWidget(self.labelWarn)
         vbox.addStretch(0)
         hbox.addLayout(vbox)
         hbox.addStretch(0)
@@ -79,11 +83,13 @@ class Board(QWidget):
         for i in range(0, 9):
             self.board[i] = 0
             self.button[i].setText("")
-        self.player = "O"
+        self.player = "X"
 
     def on_button_clicked(self, n):
         # Check for valid move, space is empty
+        self.labelWarn.setText("")
         if self.board[n] != 0:
+            self.labelWarn.setText("Invalid move")
             return
         # Enter move into the board array
         self.board[n] = self.player
