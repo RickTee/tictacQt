@@ -45,12 +45,13 @@ class Board(QWidget):
         # Add a label to contain warnings.
         self.labelWarn = QLabel("")
         self.labelWarn.setAlignment(Qt.AlignCenter)
+        # Create a grid layout & set the spacing
         grid = QGridLayout()
         grid.setSpacing(0)
 
         self.board = [0]*9
         self.button = [0]*9
-        self.player = "X"
+        self.player = "O"
         k = 0
         # Create our board of 9 buttons and put them in a grid
         for i in range(0, 3):
@@ -83,7 +84,10 @@ class Board(QWidget):
         for i in range(0, 9):
             self.board[i] = 0
             self.button[i].setText("")
+            self.label.setText("")
+            self.labelWarn.setText("")
         self.player = "X"
+        self.toggle_buttons(True)
 
     def on_button_clicked(self, n):
         # Check for valid move, space is empty
@@ -96,13 +100,17 @@ class Board(QWidget):
         self.button[n].setText(self.player)
         # Check for win or draw
         win = self.check_win()
-        if win == 1:
-            self.label.setText("O won")
-        if win == 2:
-            self.label.setText("X won")
-        if win == 3:
-            self.label.setText("Game is a draw")
+        if win:
+            self.end_game()
         self.set_player()
+
+    def toggle_buttons(self, on_off):
+        for i in range (9):
+            self.button[i].setEnabled(on_off)
+
+    def end_game(self):
+        self.labelWarn.setText("Game over")
+        self.toggle_buttons(False)
 
     # Alternate players
     def set_player(self):
@@ -114,28 +122,35 @@ class Board(QWidget):
     # Test for a win or a draw
     def check_win(self):
         count = 0
+        win = 0
         i = 0
         # Check for 3 O's or X's in rows
         while i < 7:
             if self.board[i] == 'O' and self.board[i + 1] == 'O' and self.board[i + 2] == 'O':
+                self.label.setText("O won")
                 return 1
             if self.board[i] == 'X' and self.board[i + 1] == 'X' and self.board[i + 2] == 'X':
+                self.label.setText("X won")
                 return 2
             i = i + 3
 
         # Check for 3 O's or X's in columns
         for i in range(0, 3):
             if self.board[i] == 'O' and self.board[i + 3] == 'O' and self.board[i + 6] == 'O':
+                self.label.setText("O won")
                 return 1
             if self.board[i] == 'X' and self.board[i + 3] == 'X' and self.board[i + 6] == 'X':
+                self.label.setText("X won")
                 return 2
 
         # Check for 3 O's or X's in diagonals
         if ((self.board[0] == 'O' and self.board[4] == 'O' and self.board[8] == 'O') or (
                 self.board[2] == 'O' and self.board[4] == 'O' and self.board[6] == 'O')):
+            self.label.setText("O won")
             return 1
         if ((self.board[0] == 'X' and self.board[4] == 'X' and self.board[8] == 'X') or (
                 self.board[2] == 'X' and self.board[4] == 'X' and self.board[6] == 'X')):
+            self.label.setText("X won")
             return 2
 
         # Check for a draw
@@ -143,5 +158,6 @@ class Board(QWidget):
             if self.board[i] != 0:
                 count = count + 1
             if count == 9:
+                self.label.setText("Game is a draw")
                 return 3
         return
