@@ -42,62 +42,64 @@ class Board(QWidget):
         self.label = QLabel("Play")
         self.label.setAlignment(Qt.AlignCenter)
         vbox.addWidget(self.label)
-        # Add a label to contain warnings.
+        # Create a label to contain warnings.
         self.labelWarn = QLabel("")
         self.labelWarn.setAlignment(Qt.AlignCenter)
         # Create a grid layout & set the spacing
         grid = QGridLayout()
         grid.setSpacing(0)
 
-        self.board = [0]*9
-        self.button = [0]*9
-        self.player = "O"
+        self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        self.button = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        self.player = "X"
         k = 0
         # Create our board of 9 buttons and put them in a grid
         for i in range(0, 3):
             for j in range(0, 3):
-                self.button[k] = QPushButton()
-                self.button[k].setMinimumSize(25, 25)
-                self.button[k].setMaximumSize(25, 25)
-                grid.addWidget(self.button[k], i, j)
+                self.button[i][j] = QPushButton()
+                self.button[i][j].setMinimumSize(25, 25)
+                self.button[i][j].setMaximumSize(25, 25)
+                grid.addWidget(self.button[i][j], i, j)
                 k = k + 1
 
         vbox.addLayout(grid)
+        # Add the warnings label
         vbox.addWidget(self.labelWarn)
         vbox.addStretch(0)
         hbox.addLayout(vbox)
         hbox.addStretch(0)
         self.setLayout(hbox)
 
-        self.button[0].clicked.connect(lambda: self.on_button_clicked(0))
-        self.button[1].clicked.connect(lambda: self.on_button_clicked(1))
-        self.button[2].clicked.connect(lambda: self.on_button_clicked(2))
-        self.button[3].clicked.connect(lambda: self.on_button_clicked(3))
-        self.button[4].clicked.connect(lambda: self.on_button_clicked(4))
-        self.button[5].clicked.connect(lambda: self.on_button_clicked(5))
-        self.button[6].clicked.connect(lambda: self.on_button_clicked(6))
-        self.button[7].clicked.connect(lambda: self.on_button_clicked(7))
-        self.button[8].clicked.connect(lambda: self.on_button_clicked(8))
+        self.button[0][0].clicked.connect(lambda: self.on_button_clicked(0, 0))
+        self.button[0][1].clicked.connect(lambda: self.on_button_clicked(0, 1))
+        self.button[0][2].clicked.connect(lambda: self.on_button_clicked(0, 2))
+        self.button[1][0].clicked.connect(lambda: self.on_button_clicked(1, 0))
+        self.button[1][1].clicked.connect(lambda: self.on_button_clicked(1, 1))
+        self.button[1][2].clicked.connect(lambda: self.on_button_clicked(1, 2))
+        self.button[2][0].clicked.connect(lambda: self.on_button_clicked(2, 0))
+        self.button[2][1].clicked.connect(lambda: self.on_button_clicked(2, 1))
+        self.button[2][2].clicked.connect(lambda: self.on_button_clicked(2, 2))
 
     # Reset our board array and clear the text in our buttons
     def new_game(self):
-        for i in range(0, 9):
-            self.board[i] = 0
-            self.button[i].setText("")
-            self.label.setText("")
-            self.labelWarn.setText("")
+        for i in range(0, 3):
+            for j in range(0, 3):
+                self.board[i][j] = 0
+                self.button[i][j].setText("")
+        self.label.setText("")
+        self.labelWarn.setText("")
         self.player = "X"
         self.toggle_buttons(True)
 
-    def on_button_clicked(self, n):
+    def on_button_clicked(self, i, j):
         # Check for valid move, space is empty
         self.labelWarn.setText("")
-        if self.board[n] != 0:
+        if self.board[i][j] != 0:
             self.labelWarn.setText("Invalid move")
             return
         # Enter move into the board array
-        self.board[n] = self.player
-        self.button[n].setText(self.player)
+        self.board[i][j] = self.player
+        self.button[i][j].setText(self.player)
         # Check for win or draw
         win = self.check_win()
         if win:
@@ -105,8 +107,9 @@ class Board(QWidget):
         self.set_player()
 
     def toggle_buttons(self, on_off):
-        for i in range (9):
-            self.button[i].setEnabled(on_off)
+        for i in range (0, 3):
+            for j in range(0, 3):
+                self.button[i][j].setEnabled(on_off)
 
     def end_game(self):
         self.labelWarn.setText("Game over")
@@ -122,42 +125,40 @@ class Board(QWidget):
     # Test for a win or a draw
     def check_win(self):
         count = 0
-        win = 0
-        i = 0
         # Check for 3 O's or X's in rows
-        while i < 7:
-            if self.board[i] == 'O' and self.board[i + 1] == 'O' and self.board[i + 2] == 'O':
+        for i in range(0, 3):
+            if self.board[i][0] == 'O' and self.board[i][1] == 'O' and self.board[i][2] == 'O':
                 self.label.setText("O won")
                 return 1
-            if self.board[i] == 'X' and self.board[i + 1] == 'X' and self.board[i + 2] == 'X':
+            if self.board[i][0] == 'X' and self.board[i][1] == 'X' and self.board[i][2] == 'X':
                 self.label.setText("X won")
                 return 2
-            i = i + 3
 
         # Check for 3 O's or X's in columns
-        for i in range(0, 3):
-            if self.board[i] == 'O' and self.board[i + 3] == 'O' and self.board[i + 6] == 'O':
+        for j in range(0, 3):
+            if self.board[0][j] == 'O' and self.board[1][j] == 'O' and self.board[2][j] == 'O':
                 self.label.setText("O won")
                 return 1
-            if self.board[i] == 'X' and self.board[i + 3] == 'X' and self.board[i + 6] == 'X':
+            if self.board[0][j] == 'X' and self.board[1][j] == 'X' and self.board[2][j] == 'X':
                 self.label.setText("X won")
                 return 2
 
         # Check for 3 O's or X's in diagonals
-        if ((self.board[0] == 'O' and self.board[4] == 'O' and self.board[8] == 'O') or (
-                self.board[2] == 'O' and self.board[4] == 'O' and self.board[6] == 'O')):
+        if ((self.board[0][0] == 'O' and self.board[1][1] == 'O' and self.board[2][2] == 'O') or (
+                self.board[0][2] == 'O' and self.board[1][1] == 'O' and self.board[2][0] == 'O')):
             self.label.setText("O won")
             return 1
-        if ((self.board[0] == 'X' and self.board[4] == 'X' and self.board[8] == 'X') or (
-                self.board[2] == 'X' and self.board[4] == 'X' and self.board[6] == 'X')):
+        if ((self.board[0][0] == 'X' and self.board[1][1] == 'X' and self.board[2][2] == 'X') or (
+                self.board[0][2] == 'X' and self.board[1][1] == 'X' and self.board[2][0] == 'X')):
             self.label.setText("X won")
             return 2
 
         # Check for a draw
-        for i in range(9):
-            if self.board[i] != 0:
-                count = count + 1
-            if count == 9:
-                self.label.setText("Game is a draw")
-                return 3
+        for i in range(0, 3):
+            for j in range(0, 3):
+                if self.board[i][j] != 0:
+                    count = count + 1
+        if count == 9:
+            self.label.setText("Game is a draw")
+            return 3
         return
