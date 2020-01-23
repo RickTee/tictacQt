@@ -1,6 +1,6 @@
 # Tictactoe Qt ( 0's and X's)
 # 15/11/2019
-# Version 0.2
+# Version 0.3
 # Author Rick Townsend
 
 # Import the Qt libraries
