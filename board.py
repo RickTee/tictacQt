@@ -137,7 +137,6 @@ class Board(QWidget):
 
     # Test for a win or a draw
     def check_win(self):
-        count = 0
         # Check for 3 O's or X's in rows
         for i in range(0, 3):
             if self.board[i][0] == 1 and self.board[i][1] == 1 and self.board[i][2] == 1:
@@ -161,6 +160,7 @@ class Board(QWidget):
             return 2
 
         # Check for a draw
+        count = 0
         for i in range(0, 3):
             for j in range(0, 3):
                 if self.board[i][j] != 0:
@@ -214,7 +214,6 @@ class Board(QWidget):
                         score = self.minimax(depth + 1, True)
                         self.board[i][j] = 0
                         best_score = min(score, best_score)
-
             return best_score
 
     # Print out the board for debugging
