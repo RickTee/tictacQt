@@ -92,9 +92,8 @@ class Board(QWidget):
 
     def on_button_clicked(self, i, j):
         # If this is the ai's turn
-        if self.player == 2:
-            i, j = self.best_move()
-
+        #if self.player == 2:
+            #i, j = self.best_move()
         # Check for valid move, space is empty
         self.labelWarn.setText("")
         if self.board[i][j] != 0:
@@ -128,7 +127,8 @@ class Board(QWidget):
     def set_player(self):
         if self.player == 1:
             self.player = 2
-            # best_move(self.board)
+            i, j = self.best_move()
+            self.on_button_clicked(i, j)
         else:
             self.player = 1
 
