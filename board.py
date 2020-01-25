@@ -51,6 +51,9 @@ class Board(QWidget):
 
         self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.button = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        self.INFINITY = 999
+        self.ai = 2
+        self.human = 1
         self.player = 1
         self.O_X = ['f', 'X', 'O']
         # Create our board of 9 buttons and put them in a grid
@@ -107,7 +110,7 @@ class Board(QWidget):
         if win == 1:
             self.label.setText("X won")
         if win == 2:
-            self.label.setText("X won")
+            self.label.setText("O won")
         if win == 3:
             self.label.setText("Game is a draw")
         if win:
@@ -137,24 +140,24 @@ class Board(QWidget):
         count = 0
         # Check for 3 O's or X's in rows
         for i in range(0, 3):
-            if self.board[i][0] == 2 and self.board[i][1] == 2 and self.board[i][2] == 2:
-                return 1
             if self.board[i][0] == 1 and self.board[i][1] == 1 and self.board[i][2] == 1:
+                return 1
+            if self.board[i][0] == 2 and self.board[i][1] == 2 and self.board[i][2] == 2:
                 return 2
 
         # Check for 3 O's or X's in columns
         for j in range(0, 3):
-            if self.board[0][j] == 2 and self.board[1][j] == 2 and self.board[2][j] == 2:
-                return 1
             if self.board[0][j] == 1 and self.board[1][j] == 1 and self.board[2][j] == 1:
+                return 1
+            if self.board[0][j] == 2 and self.board[1][j] == 2 and self.board[2][j] == 2:
                 return 2
 
         # Check for 3 O's or X's in diagonals
-        if ((self.board[0][0] == 2 and self.board[1][1] == 2 and self.board[2][2] == 2) or (
-                self.board[0][2] == 2 and self.board[1][1] == 2 and self.board[2][0] == 2)):
-            return 1
         if ((self.board[0][0] == 1 and self.board[1][1] == 1 and self.board[2][2] == 1) or (
                 self.board[0][2] == 1 and self.board[1][1] == 1 and self.board[2][0] == 1)):
+            return 1
+        if ((self.board[0][0] == 2 and self.board[1][1] == 2 and self.board[2][2] == 2) or (
+                self.board[0][2] == 2 and self.board[1][1] == 2 and self.board[2][0] == 2)):
             return 2
 
         # Check for a draw
@@ -167,10 +170,6 @@ class Board(QWidget):
         return False
 
     # Minimax algorithm chooses ai move ('O')
-    INFINITY = 99999999
-    ai = 2
-    human = 1
-
     def best_move(self):
         # AI to make its turn
         best_score = -self.INFINITY
@@ -187,7 +186,7 @@ class Board(QWidget):
                         move = i, j
         return move
 
-    scores = {1: 10, 2: -10, 3: 0}
+    scores = {1: -10, 2: 10, 3: 0}
 
     def minimax(self, depth, is_maximizing):
         result = self.check_win()
