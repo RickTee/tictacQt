@@ -1,6 +1,6 @@
 # Tictactoe Qt ( 0's and X's)
 # 05/11/2019
-# Version 0.3
+# Version 0.4
 # Author Rick Townsend
 
 from PyQt5.QtWidgets import *

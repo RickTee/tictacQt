@@ -1,6 +1,6 @@
-# Tictactoe Qt ( 0's and X's)
+# Ticton_off=None0's and X's)
 # 15/11/2019
-# Version 0.3
+# Version 0.4
 # Author Rick Townsend
 
 # Import the Qt libraries
@@ -51,8 +51,8 @@ class Board(QWidget):
 
         self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.button = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        self.player = "X"
-        k = 0
+        self.player = 1
+        self.O_X = ['f', 'X', 'O']
         # Create our board of 9 buttons and put them in a grid
         for i in range(0, 3):
             for j in range(0, 3):
@@ -60,7 +60,6 @@ class Board(QWidget):
                 self.button[i][j].setMinimumSize(25, 25)
                 self.button[i][j].setMaximumSize(25, 25)
                 grid.addWidget(self.button[i][j], i, j)
-                k = k + 1
 
         vbox.addLayout(grid)
         # Add the warnings label
@@ -88,10 +87,14 @@ class Board(QWidget):
                 self.button[i][j].setText("")
         self.label.setText("")
         self.labelWarn.setText("")
-        self.player = "X"
+        self.player = 1
         self.toggle_buttons(True)
 
     def on_button_clicked(self, i, j):
+        # If this is the ai's turn
+        if self.player == 2:
+            i, j = self.best_move()
+
         # Check for valid move, space is empty
         self.labelWarn.setText("")
         if self.board[i][j] != 0:
@@ -99,15 +102,21 @@ class Board(QWidget):
             return
         # Enter move into the board array
         self.board[i][j] = self.player
-        self.button[i][j].setText(self.player)
+        self.button[i][j].setText(self.O_X[self.player])
         # Check for win or draw
-        win = self.check_win()
+        win = self.check_win()  #
+        if win == 1:
+            self.label.setText("X won")
+        if win == 2:
+            self.label.setText("X won")
+        if win == 3:
+            self.label.setText("Game is a draw")
         if win:
             self.end_game()
         self.set_player()
 
     def toggle_buttons(self, on_off):
-        for i in range (0, 3):
+        for i in range(0, 3):
             for j in range(0, 3):
                 self.button[i][j].setEnabled(on_off)
 
@@ -117,40 +126,35 @@ class Board(QWidget):
 
     # Alternate players
     def set_player(self):
-        if self.player == "X":
-            self.player = "O"
+        if self.player == 1:
+            self.player = 2
+            # best_move(self.board)
         else:
-            self.player = "X"
+            self.player = 1
 
     # Test for a win or a draw
     def check_win(self):
         count = 0
         # Check for 3 O's or X's in rows
         for i in range(0, 3):
-            if self.board[i][0] == 'O' and self.board[i][1] == 'O' and self.board[i][2] == 'O':
-                self.label.setText("O won")
+            if self.board[i][0] == 2 and self.board[i][1] == 2 and self.board[i][2] == 2:
                 return 1
-            if self.board[i][0] == 'X' and self.board[i][1] == 'X' and self.board[i][2] == 'X':
-                self.label.setText("X won")
+            if self.board[i][0] == 1 and self.board[i][1] == 1 and self.board[i][2] == 1:
                 return 2
 
         # Check for 3 O's or X's in columns
         for j in range(0, 3):
-            if self.board[0][j] == 'O' and self.board[1][j] == 'O' and self.board[2][j] == 'O':
-                self.label.setText("O won")
+            if self.board[0][j] == 2 and self.board[1][j] == 2 and self.board[2][j] == 2:
                 return 1
-            if self.board[0][j] == 'X' and self.board[1][j] == 'X' and self.board[2][j] == 'X':
-                self.label.setText("X won")
+            if self.board[0][j] == 1 and self.board[1][j] == 1 and self.board[2][j] == 1:
                 return 2
 
         # Check for 3 O's or X's in diagonals
-        if ((self.board[0][0] == 'O' and self.board[1][1] == 'O' and self.board[2][2] == 'O') or (
-                self.board[0][2] == 'O' and self.board[1][1] == 'O' and self.board[2][0] == 'O')):
-            self.label.setText("O won")
+        if ((self.board[0][0] == 2 and self.board[1][1] == 2 and self.board[2][2] == 2) or (
+                self.board[0][2] == 2 and self.board[1][1] == 2 and self.board[2][0] == 2)):
             return 1
-        if ((self.board[0][0] == 'X' and self.board[1][1] == 'X' and self.board[2][2] == 'X') or (
-                self.board[0][2] == 'X' and self.board[1][1] == 'X' and self.board[2][0] == 'X')):
-            self.label.setText("X won")
+        if ((self.board[0][0] == 1 and self.board[1][1] == 1 and self.board[2][2] == 1) or (
+                self.board[0][2] == 1 and self.board[1][1] == 1 and self.board[2][0] == 1)):
             return 2
 
         # Check for a draw
@@ -159,6 +163,61 @@ class Board(QWidget):
                 if self.board[i][j] != 0:
                     count = count + 1
         if count == 9:
-            self.label.setText("Game is a draw")
             return 3
-        return
+        return False
+
+    # Minimax algorithm chooses ai move ('O')
+    INFINITY = 99999999
+    ai = 2
+    human = 1
+
+    def best_move(self):
+        # AI to make its turn
+        best_score = -self.INFINITY
+        move = [0, 0]
+        for i in range(3):
+            for j in range(3):
+                # Is the spot available?
+                if self.board[i][j] == 0:
+                    self.board[i][j] = self.ai
+                    score = self.minimax(0, False)
+                    self.board[i][j] = 0
+                    if score > best_score:
+                        best_score = score
+                        move = i, j
+        return move
+
+    scores = {1: 10, 2: -10, 3: 0}
+
+    def minimax(self, depth, is_maximizing):
+        result = self.check_win()
+        if result:
+            return self.scores[result]
+
+        if is_maximizing:
+            best_score = -self.INFINITY
+            for i in range(3):
+                for j in range(3):
+                    # Is the spot available?
+                    if self.board[i][j] == 0:
+                        self.board[i][j] = self.ai
+                        score = self.minimax(depth + 1, False)
+                        self.board[i][j] = 0
+                        best_score = max(score, best_score)
+            return best_score
+        else:
+            best_score = self.INFINITY
+            for i in range(3):
+                for j in range(3):
+                    # Is the spot available?
+                    if self.board[i][j] == 0:
+                        self.board[i][j] = self.human
+                        score = self.minimax(depth + 1, True)
+                        self.board[i][j] = 0
+                        best_score = min(score, best_score)
+
+            return best_score
+
+    # Print out the board for debugging
+    def dump(self):
+        print(self.board)
