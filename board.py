@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5 import QtGui
 
+GRID_SIZE = 3
 
 # Create our Board class with QWidget class as parent
 class Board(QWidget):
@@ -57,8 +58,8 @@ class Board(QWidget):
         self.player = 1
         self.O_X = ['f', 'X', 'O']
         # Create our board of 9 buttons and put them in a grid
-        for i in range(0, 3):
-            for j in range(0, 3):
+        for i in range(0, GRID_SIZE):
+            for j in range(0, GRID_SIZE):
                 self.button[i][j] = QPushButton()
                 self.button[i][j].setMinimumSize(25, 25)
                 self.button[i][j].setMaximumSize(25, 25)
@@ -84,8 +85,8 @@ class Board(QWidget):
 
     # Reset our board array and clear the text in our buttons
     def new_game(self):
-        for i in range(0, 3):
-            for j in range(0, 3):
+        for i in range(0, GRID_SIZE):
+            for j in range(0, GRID_SIZE):
                 self.board[i][j] = 0
                 self.button[i][j].setText("")
         self.label.setText("")
@@ -94,12 +95,9 @@ class Board(QWidget):
         self.toggle_buttons(True)
 
     def on_button_clicked(self, i, j):
-        # If this is the ai's turn
-        #if self.player == 2:
-            #i, j = self.best_move()
         # Check for valid move, space is empty
         self.labelWarn.setText("")
-        if self.board[i][j] != 0:
+        if self.board[i][j] != 0 and self.player != 2:
             self.labelWarn.setText("Invalid move")
             return
         # Enter move into the board array
@@ -118,8 +116,8 @@ class Board(QWidget):
         self.set_player()
 
     def toggle_buttons(self, on_off):
-        for i in range(0, 3):
-            for j in range(0, 3):
+        for i in range(0, GRID_SIZE):
+            for j in range(0, GRID_SIZE):
                 self.button[i][j].setEnabled(on_off)
 
     def end_game(self):
@@ -138,17 +136,15 @@ class Board(QWidget):
     # Test for a win or a draw
     def check_win(self):
         # Check for 3 O's or X's in rows
-        for i in range(0, 3):
+        for i in range(0, GRID_SIZE):
             if self.board[i][0] == 1 and self.board[i][1] == 1 and self.board[i][2] == 1:
                 return 1
             if self.board[i][0] == 2 and self.board[i][1] == 2 and self.board[i][2] == 2:
                 return 2
-
-        # Check for 3 O's or X's in columns
-        for j in range(0, 3):
-            if self.board[0][j] == 1 and self.board[1][j] == 1 and self.board[2][j] == 1:
+            # Check for 3 O's or X's in columns
+            if self.board[0][i] == 1 and self.board[1][i] == 1 and self.board[2][i] == 1:
                 return 1
-            if self.board[0][j] == 2 and self.board[1][j] == 2 and self.board[2][j] == 2:
+            if self.board[0][i] == 2 and self.board[1][i] == 2 and self.board[2][i] == 2:
                 return 2
 
         # Check for 3 O's or X's in diagonals
@@ -161,8 +157,8 @@ class Board(QWidget):
 
         # Check for a draw
         count = 0
-        for i in range(0, 3):
-            for j in range(0, 3):
+        for i in range(0, GRID_SIZE):
+            for j in range(0, GRID_SIZE):
                 if self.board[i][j] != 0:
                     count = count + 1
         if count == 9:
@@ -174,8 +170,8 @@ class Board(QWidget):
         # AI to make its turn
         best_score = -self.INFINITY
         move = [0, 0]
-        for i in range(3):
-            for j in range(3):
+        for i in range(0, GRID_SIZE):
+            for j in range(0, GRID_SIZE):
                 # Is the spot available?
                 if self.board[i][j] == 0:
                     self.board[i][j] = self.ai
@@ -195,8 +191,8 @@ class Board(QWidget):
 
         if is_maximizing:
             best_score = -self.INFINITY
-            for i in range(3):
-                for j in range(3):
+            for i in range(0, GRID_SIZE):
+                for j in range(0, GRID_SIZE):
                     # Is the spot available?
                     if self.board[i][j] == 0:
                         self.board[i][j] = self.ai
@@ -206,8 +202,8 @@ class Board(QWidget):
             return best_score
         else:
             best_score = self.INFINITY
-            for i in range(3):
-                for j in range(3):
+            for i in range(0, GRID_SIZE):
+                for j in range(0, GRID_SIZE):
                     # Is the spot available?
                     if self.board[i][j] == 0:
                         self.board[i][j] = self.human
